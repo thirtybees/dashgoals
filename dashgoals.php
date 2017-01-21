@@ -94,20 +94,21 @@ class DashGoals extends Module
         $tab->id_parent = -1;
         $tab->module = $this->name;
 
-        return (
-            $tab->add()
-            && parent::install()
-            && $this->registerHook('dashboardZoneTwo')
-            && $this->registerHook('dashboardData')
-            && $this->registerHook('actionAdminControllerSetMedia')
-        );
+        if (!parent::install()) {
+            return false;
+        }
+        $tab->add();
+        $this->registerHook('dashboardZoneTwo');
+        $this->registerHook('dashboardData');
+
+        return true;
     }
 
     public function uninstall()
     {
-        $id_tab = (int) Tab::getIdFromClassName('AdminDashgoals');
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
+        $idTab = (int) Tab::getIdFromClassName('AdminDashgoals');
+        if ($idTab) {
+            $tab = new Tab($idTab);
             $tab->delete();
         }
 
