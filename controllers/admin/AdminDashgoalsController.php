@@ -35,12 +35,12 @@ class AdminDashgoalsController extends ModuleAdminController
 		$months = $this->module->setMonths($year);
 
 		$this->context->smarty->assign(
-			array(
+			[
 				'currency' => $this->context->currency,
 				'goals_year' => $year,
 				'goals_months' => $months,
 				'link' => $this->context->link
-			)
+            ]
 		);
 
 		die($this->module->display(_PS_MODULE_DIR_.$this->module->name.DIRECTORY_SEPARATOR.$this->module->name.'.php', 'config.tpl'));
