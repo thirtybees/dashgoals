@@ -24,7 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-if (!defined('_PS_VERSION_')) {
+if (!defined('_TB_VERSION_')) {
     exit;
 }
 
@@ -41,8 +41,8 @@ class DashGoals extends Module
     {
         $this->name = 'dashgoals';
         $this->tab = 'dashboard';
-        $this->version = '0.7.0';
-        $this->author = 'PrestaShop';
+        $this->version = '1.0.0';
+        $this->author = 'thirty bees';
 
         parent::__construct();
 
