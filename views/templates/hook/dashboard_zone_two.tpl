@@ -27,6 +27,7 @@
 	var currency_format = {$currency->format|intval};
 	var currency_sign = '{$currency->sign|addslashes}';
 	var currency_blank = {$currency->blank|intval};
+	var currency_iso_code = '{$currency->iso_code|escape:'javascript':'UTF-8'}';
 	var priceDisplayPrecision = 0;
 	var dashgoals_year = {$goals_year|intval};
 	var dashgoals_ajax_link = '{$dashgoals_ajax_link|addslashes}';
