@@ -100,6 +100,7 @@ class DashGoals extends Module
         $tab->add();
         $this->registerHook('dashboardZoneTwo');
         $this->registerHook('dashboardData');
+        $this->registerHook('displayBackOfficeHeader');
 
         return true;
     }
@@ -115,7 +116,7 @@ class DashGoals extends Module
         return parent::uninstall();
     }
 
-    public function hookActionAdminControllerSetMedia()
+    public function hookDisplayBackOfficeHeader()
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
