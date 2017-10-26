@@ -1,6 +1,9 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2016 PrestaShop
+ *
+ * thirty bees is an extension to the PrestaShop e-commerce software developed by PrestaShop SA
+ * Copyright (C) 2017 thirty bees
  *
  * NOTICE OF LICENSE
  *
@@ -10,24 +13,23 @@
  * http://opensource.org/licenses/afl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * to license@thirtybees.com so we can send you a copy immediately.
  *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
+ * @author    thirty bees <modules@thirtybees.com>
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2015 PrestaShop SA
+ * @copyright 2017 thirty bees
+ * @copyright 2007-2016 PrestaShop SA
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
+ * PrestaShop is an internationally registered trademark & property of PrestaShop SA
  */
 
 if (!defined('_TB_VERSION_')) {
     exit;
 }
 
+/**
+ * Class DashGoals
+ */
 class DashGoals extends Module
 {
     protected static $month_labels = [];
@@ -37,11 +39,14 @@ class DashGoals extends Module
     protected static $more_color = ['#803E84', '#008E7E', '#20B2E7', '#F66E1B'];
     protected static $less_color = ['#BC77BE', '#00C2BB', '#51D6F2', '#FBB244'];
 
+    /**
+     * DashGoals constructor.
+     */
     public function __construct()
     {
         $this->name = 'dashgoals';
         $this->tab = 'dashboard';
-        $this->version = '1.0.0';
+        $this->version = '2.0.1';
         $this->author = 'thirty bees';
 
         parent::__construct();
