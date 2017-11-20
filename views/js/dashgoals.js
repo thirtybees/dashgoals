@@ -125,8 +125,8 @@ function bar_chart_goals(widget_name, chart_details) {
 }
 
 function selectDashgoalsChart(type) {
-  if (type !== false) {
-    $.each(dashgoals_data, function (index, value) {
+  if (type) {
+    dashgoals_data.forEach(function (index, value) {
       if (value.key === type + '_real' || value.key === type + '_more' || value.key === type + '_less') {
         value.disabled = false;
       } else {
@@ -140,11 +140,13 @@ function selectDashgoalsChart(type) {
 /* 	Refresh dashgoals chart when coming from the config panel
  Called from /js/admin-dashboard.js: toggleDashConfig() */
 function dashgoals_toggleDashConfig() {
-  d3.select('#dash_goals_chart1 svg')
-    .datum(dashgoals_data)
-    .transition()
-    .call(dashgoals_chart);
-  nv.utils.windowResize(dashgoals_chart.update);
+  if (dashgoals_data && dashgoals_chart) {
+    d3.select('#dash_goals_chart1 svg')
+      .datum(dashgoals_data)
+      .transition()
+      .call(dashgoals_chart);
+    nv.utils.windowResize(dashgoals_chart.update);
+  }
 }
 
 /* 	Calculate Sales based on the traffic, average cart value and conversion rate */

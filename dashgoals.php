@@ -46,7 +46,7 @@ class DashGoals extends Module
     {
         $this->name = 'dashgoals';
         $this->tab = 'dashboard';
-        $this->version = '2.0.1';
+        $this->version = '2.0.2';
         $this->author = 'thirty bees';
 
         parent::__construct();
@@ -107,6 +107,7 @@ class DashGoals extends Module
         }
 
         $tab->add();
+        $this->registerHook('actionAdminControllerSetMedia');
         $this->registerHook('dashboardZoneTwo');
         $this->registerHook('dashboardData');
         $this->registerHook('displayBackOfficeHeader');
@@ -126,6 +127,17 @@ class DashGoals extends Module
         }
 
         return parent::uninstall();
+    }
+
+    /**
+     * Action admin controller set media
+     */
+    public function hookActionAdminControllerSetMedia()
+    {
+        if (get_class($this->context->controller) == 'AdminDashboardController') {
+            $this->context->controller->addJquery();
+            $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+        }
     }
 
     /**

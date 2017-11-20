@@ -27,10 +27,10 @@ if (!defined('_TB_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_0_0($module)
+function upgrade_module_2_0_2($module)
 {
     /** @var DashGoals $module */
-    $module->registerHook('displayBackOfficeHeader');
+    $module->registerHook('actionAdminControllerSetMedia');
 
     return true;
 }
