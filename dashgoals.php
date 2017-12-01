@@ -46,7 +46,7 @@ class DashGoals extends Module
     {
         $this->name = 'dashgoals';
         $this->tab = 'dashboard';
-        $this->version = '2.0.3';
+        $this->version = '2.0.4';
         $this->author = 'thirty bees';
 
         parent::__construct();
