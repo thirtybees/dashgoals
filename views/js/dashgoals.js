@@ -183,7 +183,21 @@ function dashgoals_changeYear(xward)
   });
 }
 
-$(document).ready(function() {
-  $('.dashgoals_config_input').keyup(function() { dashgoals_calc_sales(); });
-  dashgoals_calc_sales();
-});
+(function () {
+  function initDashgoals() {
+    if (typeof $ === 'undefined') {
+      setTimeout(initDashgoals, 10);
+
+      return;
+    }
+
+    $(document).ready(function () {
+      $('.dashgoals_config_input').keyup(function () {
+        dashgoals_calc_sales();
+      });
+      dashgoals_calc_sales();
+    });
+  }
+
+  initDashgoals();
+}());
