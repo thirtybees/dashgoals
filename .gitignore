@@ -1,1 +1,7 @@
-*dashgoals*.zip
+
+/translations/*
+!/translations/index.php
+
+/config*.xml
+
+dashgoals-*.zip
