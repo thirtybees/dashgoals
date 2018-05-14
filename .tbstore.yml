@@ -1,0 +1,13 @@
+module_name: Dashboard Goals
+compatible_versions: 1.0.0+
+author: thirty bees
+category: back office
+tags:
+  - statistics
+  - forecast
+  - revenue
+description_short: Adds a block with your store's forecast in back office.
+description: description.md
+images:
+  - image-1.png
+license: AFL 3.0
