@@ -10,4 +10,11 @@ description_short: Adds a block with your store's forecast in back office.
 description: description.md
 images:
   - image-1.png
+gdpr_compliant: false
 license: AFL 3.0
+php_version:
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+  - 7.2
