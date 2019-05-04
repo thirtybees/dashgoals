@@ -55,6 +55,7 @@ class DashGoals extends Module
         $this->displayName = $this->l('Dashboard Goals');
         $this->description = $this->l('Adds a block with your store\'s forecast.');
         $this->tb_versions_compliancy = '> 1.0.0';
+        $this->tb_min_version = '1.0.0';
 
         Dashgoals::$month_labels = [
             '01' => $this->l('January'),
