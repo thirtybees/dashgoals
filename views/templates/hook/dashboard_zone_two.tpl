@@ -28,7 +28,7 @@
   var currency_sign = '{$currency->sign|addslashes}';
   var currency_blank = {$currency->blank|intval};
   var currency_iso_code = '{$currency->iso_code|escape:'javascript':'UTF-8'}';
-  var priceDisplayPrecision = 0;
+  var priceDisplayPrecision = {if ($currency->decimals)}{$smarty.const._PS_PRICE_DISPLAY_PRECISION_}{else}0{/if};
   var dashgoals_year = {$goals_year|intval};
   var dashgoals_ajax_link = '{$dashgoals_ajax_link|addslashes}';
 </script>
