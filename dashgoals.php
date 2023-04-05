@@ -103,15 +103,15 @@ class DashGoals extends Module
     {
         Configuration::updateValue('PS_DASHGOALS_CURRENT_YEAR', date('Y'));
         for ($month = '01'; $month <= 12; $month = sprintf('%02d', $month + 1)) {
-            $key = Tools::strtoupper('dashgoals_traffic_' . $month . '_' . date('Y'));
+            $key = strtoupper('dashgoals_traffic_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 600);
             }
-            $key = Tools::strtoupper('dashgoals_conversion_' . $month . '_' . date('Y'));
+            $key = strtoupper('dashgoals_conversion_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 2);
             }
-            $key = Tools::strtoupper('dashgoals_avg_cart_value_' . $month . '_' . date('Y'));
+            $key = strtoupper('dashgoals_avg_cart_value_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 80);
             }
@@ -221,9 +221,9 @@ class DashGoals extends Module
             foreach ($months as $month => &$monthRow) {
                 $key = 'dashgoals_' . $type . '_' . $month;
                 if (Tools::isSubmit('submitDashGoals')) {
-                    ConfigurationKPI::updateValue(Tools::strtoupper($key), (float)Tools::getValue($key));
+                    ConfigurationKPI::updateValue(strtoupper($key), (float)Tools::getValue($key));
                 }
-                $monthRow['values'][$type] = ConfigurationKPI::get(Tools::strtoupper($key));
+                $monthRow['values'][$type] = ConfigurationKPI::get(strtoupper($key));
             }
         }
 
