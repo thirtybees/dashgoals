@@ -27,9 +27,14 @@ if (!defined('_TB_VERSION_')) {
     exit;
 }
 
+/**
+ * @param DashGoals $module
+ *
+ * @return true
+ * @throws PrestaShopException
+ */
 function upgrade_module_2_0_2($module)
 {
-    /** @var DashGoals $module */
     $module->registerHook('actionAdminControllerSetMedia');
 
     return true;

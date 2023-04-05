@@ -32,15 +32,36 @@ if (!defined('_TB_VERSION_')) {
  */
 class DashGoals extends Module
 {
+
+    /**
+     * @var array
+     */
     protected static $month_labels = [];
+
+    /**
+     * @var string[]
+     */
     protected static $types = ['traffic', 'conversion', 'avg_cart_value'];
 
+    /**
+     * @var string[]
+     */
     protected static $real_color = ['#9E5BA1', '#00A89C', '#3AC4ED', '#F99031'];
+
+    /**
+     * @var string[]
+     */
     protected static $more_color = ['#803E84', '#008E7E', '#20B2E7', '#F66E1B'];
+
+    /**
+     * @var string[]
+     */
     protected static $less_color = ['#BC77BE', '#00C2BB', '#51D6F2', '#FBB244'];
 
     /**
      * DashGoals constructor.
+     *
+     * @throws PrestaShopException
      */
     public function __construct()
     {
@@ -75,20 +96,22 @@ class DashGoals extends Module
 
     /**
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function install()
     {
         Configuration::updateValue('PS_DASHGOALS_CURRENT_YEAR', date('Y'));
         for ($month = '01'; $month <= 12; $month = sprintf('%02d', $month + 1)) {
-            $key = Tools::strtoupper('dashgoals_traffic_'.$month.'_'.date('Y'));
+            $key = Tools::strtoupper('dashgoals_traffic_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 600);
             }
-            $key = Tools::strtoupper('dashgoals_conversion_'.$month.'_'.date('Y'));
+            $key = Tools::strtoupper('dashgoals_conversion_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 2);
             }
-            $key = Tools::strtoupper('dashgoals_avg_cart_value_'.$month.'_'.date('Y'));
+            $key = Tools::strtoupper('dashgoals_avg_cart_value_' . $month . '_' . date('Y'));
             if (!ConfigurationKPI::get($key)) {
                 ConfigurationKPI::updateValue($key, 80);
             }
@@ -120,10 +143,12 @@ class DashGoals extends Module
 
     /**
      * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function uninstall()
     {
-        $idTab = (int) Tab::getIdFromClassName('AdminDashgoals');
+        $idTab = (int)Tab::getIdFromClassName('AdminDashgoals');
         if ($idTab) {
             $tab = new Tab($idTab);
             $tab->delete();
@@ -139,7 +164,7 @@ class DashGoals extends Module
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
             $this->context->controller->addJquery();
-            $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+            $this->context->controller->addJs($this->_path . 'views/js/' . $this->name . '.js');
         }
     }
 
@@ -149,7 +174,7 @@ class DashGoals extends Module
     public function hookDisplayBackOfficeHeader()
     {
         if (get_class($this->context->controller) === 'AdminDashboardController') {
-            $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
+            $this->context->controller->addJs($this->_path . 'views/js/' . $this->name . '.js');
         }
     }
 
@@ -157,6 +182,9 @@ class DashGoals extends Module
      * @param array $params
      *
      * @return string
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws SmartyException
      */
     public function hookDashboardZoneTwo($params)
     {
@@ -165,10 +193,10 @@ class DashGoals extends Module
 
         $this->context->smarty->assign(
             [
-                'colors'              => self::$real_color,
-                'currency'            => $this->context->currency,
-                'goals_year'          => $year,
-                'goals_months'        => $months,
+                'colors' => self::$real_color,
+                'currency' => $this->context->currency,
+                'goals_year' => $year,
+                'goals_months' => $months,
                 'dashgoals_ajax_link' => $this->context->link->getAdminLink('AdminDashgoals'),
             ]
         );
@@ -176,18 +204,24 @@ class DashGoals extends Module
         return $this->display(__FILE__, 'dashboard_zone_two.tpl');
     }
 
+    /**
+     * @param int $year
+     *
+     * @return array
+     * @throws PrestaShopException
+     */
     public function setMonths($year)
     {
         $months = [];
         for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {
-            $months[$i.'_'.$year] = ['label' => Dashgoals::$month_labels[$i], 'values' => []];
+            $months[$i . '_' . $year] = ['label' => Dashgoals::$month_labels[$i], 'values' => []];
         }
 
         foreach (Dashgoals::$types as $type) {
             foreach ($months as $month => &$monthRow) {
-                $key = 'dashgoals_'.$type.'_'.$month;
+                $key = 'dashgoals_' . $type . '_' . $month;
                 if (Tools::isSubmit('submitDashGoals')) {
-                    ConfigurationKPI::updateValue(Tools::strtoupper($key), (float) Tools::getValue($key));
+                    ConfigurationKPI::updateValue(Tools::strtoupper($key), (float)Tools::getValue($key));
                 }
                 $monthRow['values'][$type] = ConfigurationKPI::get(Tools::strtoupper($key));
             }
@@ -196,6 +230,12 @@ class DashGoals extends Module
         return $months;
     }
 
+    /**
+     * @param array $params
+     *
+     * @return array[]
+     * @throws PrestaShopException
+     */
     public function hookDashboardData($params)
     {
         $year = ((isset($params['extra']) && $params['extra'] > 1970 && $params['extra'] < 2999) ? $params['extra'] : Configuration::get('PS_DASHGOALS_CURRENT_YEAR'));
@@ -203,6 +243,13 @@ class DashGoals extends Module
         return ['data_chart' => ['dash_goals_chart1' => $this->getChartData($year)]];
     }
 
+    /**
+     * @param int $year
+     *
+     * @return array
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function getChartData($year)
     {
         // There are stream types (different charts) and for each types there are 3 available zones (one color for the goal, one if you over perform and one if you under perfom)
@@ -226,13 +273,13 @@ class DashGoals extends Module
             $streams[$streamType['type']] = [];
             foreach ($streamZones as $streamZone) {
                 $streams[$streamType['type']][$streamZone['zone']] = [
-                    'key'       => $streamType['type'].'_'.$streamZone['zone'],
-                    'title'     => $streamType['title'],
+                    'key' => $streamType['type'] . '_' . $streamZone['zone'],
+                    'title' => $streamType['title'],
                     'unit_text' => $streamType['unit_text'],
                     'zone_text' => $streamZone['text'],
-                    'color'     => ($streamZone['zone'] == 'more' ? self::$more_color[$key] : ($streamZone['zone'] == 'less' ? self::$less_color[$key] : self::$real_color[$key])),
-                    'values'    => [],
-                    'disabled'  => (isset($streamType['type']) && $streamType['type'] == 'sales') ? false : true,
+                    'color' => ($streamZone['zone'] == 'more' ? self::$more_color[$key] : ($streamZone['zone'] == 'less' ? self::$less_color[$key] : self::$real_color[$key])),
+                    'values' => [],
+                    'disabled' => (isset($streamType['type']) && $streamType['type'] == 'sales') ? false : true,
                 ];
             }
 
@@ -253,9 +300,9 @@ class DashGoals extends Module
 
             // We need to calculate the average value of each goals for the year, this will be the base rate for "100%"
             for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {
-                $averageGoals['traffic'] += $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_'.$i.'_'.$year);
-                $averageGoals['conversion'] += $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_'.$i.'_'.$year);
-                $averageGoals['avg_cart_value'] += $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $averageGoals['traffic'] += $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_' . $i . '_' . $year);
+                $averageGoals['conversion'] += $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_' . $i . '_' . $year);
+                $averageGoals['avg_cart_value'] += $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
             }
             foreach ($averageGoals as &$averageGoal) {
                 $averageGoal /= 12;
@@ -264,9 +311,9 @@ class DashGoals extends Module
 
             // Now we can calculate the value for every months
             for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {
-                $timestamp = strtotime($year.'-'.$i.'-01');
+                $timestamp = strtotime($year . '-' . $i . '-01');
 
-                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_'.$i.'_'.$year);
+                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_' . $i . '_' . $year);
                 $value = (isset($visits[$timestamp]) ? $visits[$timestamp] : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['traffic'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -294,7 +341,7 @@ class DashGoals extends Module
                     $streams['traffic'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_'.$i.'_'.$year);
+                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_' . $i . '_' . $year);
                 $value = 100 * ((isset($visits[$timestamp]) && $visits[$timestamp] && isset($orders[$timestamp]) && $orders[$timestamp]) ? ($orders[$timestamp] / $visits[$timestamp]) : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['conversion'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -322,7 +369,7 @@ class DashGoals extends Module
                     $streams['conversion'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
                 $value = ((isset($orders[$timestamp]) && $orders[$timestamp] && isset($sales[$timestamp]) && $sales[$timestamp]) ? ($sales[$timestamp] / $orders[$timestamp]) : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['avg_cart_value'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -350,7 +397,7 @@ class DashGoals extends Module
                     $streams['avg_cart_value'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_'.$i.'_'.$year) * $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_'.$i.'_'.$year) / 100 * $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $month_goal = $this->fakeConfigurationKPI_get('DASHGOALS_TRAFFIC_' . $i . '_' . $year) * $this->fakeConfigurationKPI_get('DASHGOALS_CONVERSION_' . $i . '_' . $year) / 100 * $this->fakeConfigurationKPI_get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
                 $value = (isset($sales[$timestamp]) ? $sales[$timestamp] : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['sales'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -381,15 +428,15 @@ class DashGoals extends Module
             }
         } else {
             // Retrieve gross data from AdminStatsController
-            $visits = AdminStatsController::getVisits(false, $year.date('-01-01'), $year.date('-12-31'), 'month');
-            $orders = AdminStatsController::getOrders($year.date('-01-01'), $year.date('-12-31'), 'month');
-            $sales = AdminStatsController::getTotalSales($year.date('-01-01'), $year.date('-12-31'), 'month');
+            $visits = AdminStatsController::getVisits(false, $year . date('-01-01'), $year . date('-12-31'), 'month');
+            $orders = AdminStatsController::getOrders($year . date('-01-01'), $year . date('-12-31'), 'month');
+            $sales = AdminStatsController::getTotalSales($year . date('-01-01'), $year . date('-12-31'), 'month');
 
             // We need to calculate the average value of each goals for the year, this will be the base rate for "100%"
             for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {
-                $averageGoals['traffic'] += ConfigurationKPI::get('DASHGOALS_TRAFFIC_'.$i.'_'.$year);
-                $averageGoals['conversion'] += ConfigurationKPI::get('DASHGOALS_CONVERSION_'.$i.'_'.$year) / 100;
-                $averageGoals['avg_cart_value'] += ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $averageGoals['traffic'] += ConfigurationKPI::get('DASHGOALS_TRAFFIC_' . $i . '_' . $year);
+                $averageGoals['conversion'] += ConfigurationKPI::get('DASHGOALS_CONVERSION_' . $i . '_' . $year) / 100;
+                $averageGoals['avg_cart_value'] += ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
             }
             foreach ($averageGoals as &$averageGoal) {
                 $averageGoal /= 12;
@@ -398,9 +445,9 @@ class DashGoals extends Module
 
             // Now we can calculate the value for every months
             for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {
-                $timestamp = strtotime($year.'-'.$i.'-01');
+                $timestamp = strtotime($year . '-' . $i . '-01');
 
-                $month_goal = ConfigurationKPI::get('DASHGOALS_TRAFFIC_'.$i.'_'.$year);
+                $month_goal = ConfigurationKPI::get('DASHGOALS_TRAFFIC_' . $i . '_' . $year);
                 $value = (isset($visits[$timestamp]) ? $visits[$timestamp] : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['traffic'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -428,7 +475,7 @@ class DashGoals extends Module
                     $streams['traffic'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = ConfigurationKPI::get('DASHGOALS_CONVERSION_'.$i.'_'.$year);
+                $month_goal = ConfigurationKPI::get('DASHGOALS_CONVERSION_' . $i . '_' . $year);
                 $value = 100 * ((isset($visits[$timestamp]) && $visits[$timestamp] && isset($orders[$timestamp]) && $orders[$timestamp]) ? ($orders[$timestamp] / $visits[$timestamp]) : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['conversion'] * 100, $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -456,7 +503,7 @@ class DashGoals extends Module
                     $streams['conversion'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $month_goal = ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
                 $value = ((isset($orders[$timestamp]) && $orders[$timestamp] && isset($sales[$timestamp]) && $sales[$timestamp]) ? ($sales[$timestamp] / $orders[$timestamp]) : 0);
                 $stream_values = $this->getValuesFromGoals($averageGoals['avg_cart_value'], $month_goal, $value, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -484,7 +531,7 @@ class DashGoals extends Module
                     $streams['avg_cart_value'][$streamZone['zone']]['values'][] = $stream_values[$streamZone['zone']];
                 }
 
-                $month_goal = ConfigurationKPI::get('DASHGOALS_TRAFFIC_'.$i.'_'.$year) * ConfigurationKPI::get('DASHGOALS_CONVERSION_'.$i.'_'.$year) / 100 * ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_'.$i.'_'.$year);
+                $month_goal = ConfigurationKPI::get('DASHGOALS_TRAFFIC_' . $i . '_' . $year) * ConfigurationKPI::get('DASHGOALS_CONVERSION_' . $i . '_' . $year) / 100 * ConfigurationKPI::get('DASHGOALS_AVG_CART_VALUE_' . $i . '_' . $year);
                 $value = (isset($sales[$timestamp]) && $sales[$timestamp]) ? $sales[$timestamp] : 0;
                 $stream_values = $this->getValuesFromGoals($averageGoals['sales'], $month_goal, isset($sales[$timestamp]) ? $sales[$timestamp] : 0, Dashgoals::$month_labels[$i]);
                 $goal_diff = $value - $month_goal;
@@ -526,11 +573,16 @@ class DashGoals extends Module
         return ['chart_type' => 'bar_chart_goals', 'data' => $all_streams];
     }
 
+    /**
+     * @param string $key
+     *
+     * @return float|int|void
+     */
     protected function fakeConfigurationKPI_get($key)
     {
         $start = [
-            'TRAFFIC'        => 3000,
-            'CONVERSION'     => 2,
+            'TRAFFIC' => 3000,
+            'CONVERSION' => 2,
             'AVG_CART_VALUE' => 90,
         ];
 
@@ -543,6 +595,14 @@ class DashGoals extends Module
         }
     }
 
+    /**
+     * @param float $average_goal
+     * @param float $month_goal
+     * @param float $value
+     * @param string $label
+     *
+     * @return array[]
+     */
     protected function getValuesFromGoals($average_goal, $month_goal, $value, $label)
     {
         // Initialize value for each zone
